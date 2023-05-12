@@ -44,9 +44,30 @@ def DeletePost(request): #delete a post
     except:
         return Response({"Error": "Post Not Found"},status=404)
 
+@api_view(['GET'])
 
+def GetPost(request): #get a post
+    post_id = request.data.get('post_id')
+    try:
+        post = Post.objects.get(id=post_id)
+        serializer = PostSerializer(post,many=False)
+        return Response(serializer.data,status=200)
+    except Post.DoesNotExist:
+        return Response({"Error": "Post Not Found"},status=404)
  
 
+@api_view(['PUT'])
 
-
+def UpdatePost(request): #update a post
+    post_id = request.data.get('post_id')
+    try:
+        post = Post.objects.get(id=post_id)
+        serializer = PostSerializer(instance=post,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"Success": "Post Updated Successfully"},status=200)
+        else:
+            return Response(serializer.errors,status=400)
+    except Post.DoesNotExist:
+        return Response({"Error": "Post Not Found"},status=404)
      
